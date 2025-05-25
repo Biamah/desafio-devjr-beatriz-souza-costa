@@ -40,8 +40,9 @@ export interface ApiError {
   errors?: Record<string, string[]>;
 }
 
-/**
- * @deprecated - Use User interface instead
- * (Mantido para compatibilidade temporária)
- */
 export type UserProfile = Pick<User, "id" | "name" | "email">;
+
+export interface RegisterCredentials extends LoginCredentials {
+  name: string;
+  password_confirmation: string;
+}

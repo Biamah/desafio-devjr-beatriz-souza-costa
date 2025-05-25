@@ -1,13 +1,17 @@
 import axios, { AxiosError } from "axios";
 import { setAuthToken } from "../utils/auth";
-import type { ApiError, AuthResponse, User } from "../types/auth";
+import type {
+  ApiError,
+  AuthResponse,
+  RegisterCredentials,
+  User,
+} from "../types/auth";
 
 // Configuração base do Axios
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  withCredentials: true,
+  withXSRFToken: true,
 });
 
 // Interceptor para adicionar o token às requisições
@@ -89,6 +93,27 @@ export const authService = {
     } catch (error) {
       console.error("Failed to fetch user:", error);
       return null;
+    }
+  },
+
+  /**
+   * Registra um novo usuário
+   */
+  async register(credentials: RegisterCredentials): Promise<AuthResponse> {
+    try {
+      const response = await api.post<AuthResponse>("/register", credentials);
+      const { token, user } = response.data;
+      setAuthToken(token);
+      return { token, user };
+    } catch (error) {
+      console.error("Registration error:", error);
+      if (axios.isAxiosError<ApiError>(error)) {
+        throw new Error(
+          error.response?.data?.message ||
+            "Falha no registro. Verifique seus dados e tente novamente."
+        );
+      }
+      throw new Error("Falha no registro. Tente novamente mais tarde.");
     }
   },
 };
