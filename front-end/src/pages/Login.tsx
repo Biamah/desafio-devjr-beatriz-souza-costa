@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../services/auth";
-import { setAuthToken } from "../utils/auth";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export function Login() {
@@ -27,11 +26,7 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      const response = await authService.login(email, password);
-
-      // Armazena o token (ajuste conforme seu backend)
-      localStorage.setItem("token", response.token);
-      setAuthToken(response.token);
+      await authService.login(email, password);
 
       // Redireciona para a página inicial após login
       navigate("/dashboard");

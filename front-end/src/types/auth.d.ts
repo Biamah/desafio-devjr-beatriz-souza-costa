@@ -19,7 +19,7 @@ export interface User {
  * Resposta da API após login bem-sucedido
  */
 export interface AuthResponse {
-  token: string;
+  access_token: string;
   user: User;
 }
 

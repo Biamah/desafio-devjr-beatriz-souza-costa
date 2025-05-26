@@ -1,5 +1,5 @@
-import axios from "axios";
 import type { User } from "../types/auth";
+import { api } from "../services/auth";
 
 /**
  * Armazena o token JWT e configura os headers do Axios
@@ -7,15 +7,16 @@ import type { User } from "../types/auth";
  */
 export const setAuthToken = (token: string | null): void => {
   if (token) {
+    console.log({ token });
     // Armazena no localStorage
     localStorage.setItem("token", token);
 
     // Configura o header Authorization em todas as requisições
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
     // Remove o token e o header
     localStorage.removeItem("token");
-    delete axios.defaults.headers.common["Authorization"];
+    delete api.defaults.headers.common["Authorization"];
 
     // Limpa também o usuário do cache
     localStorage.removeItem("currentUser");
@@ -62,9 +63,3 @@ export const clearAuth = (): void => {
   setAuthToken(null);
   localStorage.removeItem("currentUser");
 };
-
-// Inicialização: Configura o token se existir ao carregar o app
-const token = getAuthToken();
-if (token) {
-  setAuthToken(token);
-}

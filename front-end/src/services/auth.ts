@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { setAuthToken } from "../utils/auth";
 import type {
   ApiError,
@@ -8,7 +8,7 @@ import type {
 } from "../types/auth";
 
 // Configuração base do Axios
-const api = axios.create({
+export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
   withCredentials: true,
   withXSRFToken: true,
@@ -17,24 +17,12 @@ const api = axios.create({
 // Interceptor para adicionar o token às requisições
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
+  console.log(token);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
-
-// Interceptor para tratar erros globais
-api.interceptors.response.use(
-  (response) => response,
-  (error: AxiosError<ApiError>) => {
-    if (error.response?.status === 401) {
-      // Token inválido ou expirado
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  }
-);
 
 export const authService = {
   /**
@@ -48,10 +36,10 @@ export const authService = {
       });
 
       // Armazena o token recebido do backend
-      const { token, user } = response.data;
-      setAuthToken(token);
+      const { access_token, user } = response.data;
+      setAuthToken(access_token);
 
-      return { token, user };
+      return { access_token, user };
     } catch (error) {
       console.error("Login error:", error);
       if (axios.isAxiosError<ApiError>(error)) {
