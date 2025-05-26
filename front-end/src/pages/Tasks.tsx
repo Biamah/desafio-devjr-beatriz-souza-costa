@@ -4,7 +4,7 @@ import { TaskList } from "../components/TaskList";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/auth";
 
-export function Dashboard() {
+export function Tasks() {
   const [refresh, setRefresh] = useState(false);
   const navigate = useNavigate();
 
@@ -19,8 +19,8 @@ export function Dashboard() {
 
   return (
     <article>
-      <h1>Dashboard</h1>
-      <p>Bem-vindo ao seu painel de controle</p>
+      <h1>Lista de Tarefas</h1>
+      <p>Bem-vindo ao seu painel de controle.</p>
 
       <div className="grid">
         <div>
