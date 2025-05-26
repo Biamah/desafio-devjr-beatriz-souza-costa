@@ -57,8 +57,20 @@ export const authService = {
   /**
    * Realiza o logout
    */
-  logout(): void {
-    setAuthToken(null);
+  async logout(): Promise<void> {
+    try {
+      await api.post("/logout");
+      this.clearAuth(); // Limpa os dados locais
+    } catch (error) {
+      console.error("Logout error:", error);
+      this.clearAuth(); // Limpa os dados mesmo se a requisição falhar
+    }
+  },
+
+  clearAuth(): void {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+    delete api.defaults.headers.common["Authorization"];
   },
 
   /**
@@ -90,9 +102,9 @@ export const authService = {
   async register(credentials: RegisterCredentials): Promise<AuthResponse> {
     try {
       const response = await api.post<AuthResponse>("/register", credentials);
-      const { token, user } = response.data;
-      setAuthToken(token);
-      return { token, user };
+      const { access_token, user } = response.data;
+      setAuthToken(access_token);
+      return { access_token, user };
     } catch (error) {
       console.error("Registration error:", error);
       if (axios.isAxiosError<ApiError>(error)) {

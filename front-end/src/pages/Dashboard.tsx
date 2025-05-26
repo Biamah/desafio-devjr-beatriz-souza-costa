@@ -1,9 +1,21 @@
 import { useState } from "react";
 import { TaskForm } from "../components/TaskForm";
 import { TaskList } from "../components/TaskList";
+import { useNavigate } from "react-router-dom";
+import { authService } from "../services/auth";
 
 export function Dashboard() {
   const [refresh, setRefresh] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      navigate('/login'); // Redireciona para a página de login
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <article>
@@ -22,7 +34,13 @@ export function Dashboard() {
         </div>
       </div>
 
-      <button className="secondary">Sair</button>
+      <button 
+        className="secondary" 
+        onClick={handleLogout}
+        aria-busy={false}
+      >
+        Sair
+      </button>
     </article>
   );
 }
