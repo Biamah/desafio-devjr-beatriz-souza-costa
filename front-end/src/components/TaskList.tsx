@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { taskService } from '../services/task';
 import type { Task } from '../types/task';
-import { FaEdit, FaSave, FaTimes } from 'react-icons/fa';
+import { FaEdit, FaSave, FaTimes, FaTrash } from 'react-icons/fa';
 
 export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -42,7 +42,7 @@ export function TaskList() {
     setEditingTask(task.id!);
     setEditForm({
       description: task.description,
-      end_date: task.end_date.split('T')[0] // Formato YYYY-MM-DD
+      end_date: task.end_date.split('T')[0]
     });
   };
 
@@ -76,13 +76,26 @@ export function TaskList() {
     }
   };
 
+  const deleteTask = async (id: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta tarefa?')) {
+      return;
+    }
+    
+    try {
+      await taskService.deleteTask(id);
+      setTasks(tasks.filter(task => task.id !== id));
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
+  };
+
   if (loading) return <p>Carregando tarefas...</p>;
   if (tasks.length === 0) return <p>Nenhuma tarefa encontrada.</p>;
 
   return (
     <ul>
       {tasks.map(task => (
-        <li key={task.id} style={{ position: 'relative' }}>
+        <li key={task.id} style={{ position: 'relative', paddingRight: '3rem' }}>
           <label>
             <input
               type="checkbox"
@@ -121,30 +134,48 @@ export function TaskList() {
             </div>
           </label>
 
-          <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+          <div style={{ 
+            position: 'absolute', 
+            top: '1rem', 
+            right: '1rem',
+            display: 'flex',
+            gap: '0.5rem'
+          }}>
             {editingTask === task.id ? (
               <>
                 <button 
                   onClick={() => saveEdit(task.id!)}
-                  style={{ marginRight: '0.5rem' }}
                   aria-label="Salvar"
+                  className="icon-button"
                 >
                   <FaSave />
                 </button>
                 <button 
                   onClick={cancelEditing}
                   aria-label="Cancelar"
+                  className="icon-button"
                 >
                   <FaTimes />
                 </button>
               </>
             ) : (
-              <button 
-                onClick={() => startEditing(task)}
-                aria-label="Editar"
-              >
-                <FaEdit />
-              </button>
+              <>
+                <button 
+                  onClick={() => startEditing(task)}
+                  aria-label="Editar"
+                  className="icon-button"
+                >
+                  <FaEdit />
+                </button>
+                <button 
+                  onClick={() => deleteTask(task.id!)}
+                  aria-label="Excluir"
+                  className="icon-button"
+                  style={{ color: 'var(--form-element-invalid-border-color)' }}
+                >
+                  <FaTrash />
+                </button>
+              </>
             )}
           </div>
         </li>
