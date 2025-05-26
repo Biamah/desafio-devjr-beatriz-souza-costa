@@ -18,7 +18,7 @@ export function TaskForm({ onTaskCreated }: TaskFormProps) {
     const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'date' ? value : value // Garante que o valor do campo de data seja tratado corretamente
+      [name]: type === 'date' ? value : value
     }));
   };
 
